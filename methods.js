@@ -143,12 +143,15 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
   let parameterNames = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterValues/ParameterNames/*", NAMESPACES);
   let parameterList = xmlOut.root().childNodes()[1].node("cwmp:GetParameterValuesResponse").node("ParameterList");
 
+  parameterNames = getSortedPaths(device);
+  
   parameterList.attr({
     "soap-enc:arrayType": "cwmp:ParameterValueStruct[" + parameterNames.length + "]"
   });
 
   for (let p of parameterNames) {
-    let name = p.text();
+    //let name = p.text();
+    let name = p;    
     let value = device[name][1];
     let type = device[name][2];
     let valueStruct = parameterList.node("ParameterValueStruct");

@@ -4,7 +4,7 @@
 "InternetGatewayDevice.LANDeviceNumberOfEntries" : [false, "1", "xsd:unsignedInt"],
 "InternetGatewayDevice.WANDeviceNumberOfEntries" : [false, "1", "xsd:unsignedInt"],
 "InternetGatewayDevice.DeviceInfo." : [false],
-"InternetGatewayDevice.DeviceInfo.Manufacturer" : [false, "Huawei Technologies Co., Ltd.", "xsd:string"],
+"InternetGatewayDevice.DeviceInfo.Manufacturer" : [false, "Huawei", "xsd:string"],
 "InternetGatewayDevice.DeviceInfo.ManufacturerOUI" : [false, "202BC1", "xsd:string"],
 "InternetGatewayDevice.DeviceInfo.ModelName" : [false, "BM632w", "xsd:string"],
 "InternetGatewayDevice.DeviceInfo.Description" : [false, "Huawei WiMAX Home Gateway", "xsd:string"],

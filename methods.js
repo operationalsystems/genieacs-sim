@@ -3,8 +3,6 @@
 const http = require("http");
 const https = require("https");
 
-const xmlserializer = require('xmlserializer');
-
 const NAMESPACES = {
   "soap-enc": "http://schemas.xmlsoap.org/soap/encoding/",
   "soap-env": "http://schemas.xmlsoap.org/soap/envelope/",

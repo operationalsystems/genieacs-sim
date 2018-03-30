@@ -96,13 +96,16 @@ function sendRequest(xml, callback) {
 
 
 function startSession() {
+  setInterval( runInform, 10000);
+}
+
+function runInform() {
   const requestId = Math.random().toString(36).slice(-8);
   const xmlOut = createSoapDocument(requestId);
-
-  methods.inform(device, xmlOut, function(xml) {
-    sendRequest(xml, function(xml) {
+  methods.inform(device, xmlOut, function (xml) {
+    sendRequest(xml, function (xml) {
       cpeRequest();
-    });
+    })
   });
 }
 

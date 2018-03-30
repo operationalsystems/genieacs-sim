@@ -3,6 +3,7 @@
 const http = require("http");
 const https = require("https");
 
+const xmlserializer = require('xmlserializer');
 
 const NAMESPACES = {
   "soap-enc": "http://schemas.xmlsoap.org/soap/encoding/",
@@ -33,9 +34,12 @@ const INFORM_PARAMS = [
 
 
 function inform(device, xmlOut, callback) {
+
   let body = xmlOut.root().childNodes()[1];
   let inform = body.node("cwmp:Inform");
   let deviceId = inform.node("DeviceId");
+
+  console.log(`Inform: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
 
   if (device["Device.DeviceInfo.Manufacturer"])
     deviceId.node("Manufacturer", device["Device.DeviceInfo.Manufacturer"][1]);
@@ -101,6 +105,9 @@ function getSortedPaths(device) {
 
 
 function GetParameterNames(device, xmlIn, xmlOut, callback) {
+
+  console.log(`GetParameterNames: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+
   let parameterNames = getSortedPaths(device);
   let parameterPath = xmlIn.get("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterNames/ParameterPath", NAMESPACES).text();
   let nextLevel = Boolean(JSON.parse(xmlIn.get("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterNames/NextLevel", NAMESPACES).text()));
@@ -140,15 +147,21 @@ function GetParameterNames(device, xmlIn, xmlOut, callback) {
 
 
 function GetParameterValues(device, xmlIn, xmlOut, callback) {
+
+  console.log(`GetParameterValues: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+
   let parameterNames = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterValues/ParameterNames/*", NAMESPACES);
   let parameterList = xmlOut.root().childNodes()[1].node("cwmp:GetParameterValuesResponse").node("ParameterList");
+
+  parameterNames = getSortedPaths(device);
 
   parameterList.attr({
     "soap-enc:arrayType": "cwmp:ParameterValueStruct[" + parameterNames.length + "]"
   });
 
   for (let p of parameterNames) {
-    let name = p.text();
+    // let name = p.text();
+      let name = p;
     let value = device[name][1];
     let type = device[name][2];
     let valueStruct = parameterList.node("ParameterValueStruct");
@@ -163,6 +176,9 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
 
 
 function SetParameterValues(device, xmlIn, xmlOut, callback) {
+
+  console.log(`SetParameterValues: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+
   let parameterValues = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:SetParameterValues/ParameterList/*", NAMESPACES);
 
   for (let p of parameterValues) {
@@ -180,6 +196,9 @@ function SetParameterValues(device, xmlIn, xmlOut, callback) {
 
 
 function AddObject(device, xmlIn, xmlOut, callback) {
+
+  console.log(`AddObject: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+
   let objectName = xmlIn.get("/soap-env:Envelope/soap-env:Body/cwmp:AddObject/ObjectName", NAMESPACES).text();
   let parameters = [];
   let instances = {};
@@ -214,6 +233,9 @@ function AddObject(device, xmlIn, xmlOut, callback) {
 
 
 function DeleteObject(device, xmlIn, xmlOut, callback) {
+
+  console.log(`DeleteObject: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+
   let objectName = xmlIn.get("/soap-env:Envelope/soap-env:Body/cwmp:DeleteObject/ObjectName", NAMESPACES).text();
 
   for (let p in device) {
@@ -229,6 +251,9 @@ function DeleteObject(device, xmlIn, xmlOut, callback) {
 
 
 function Download(device, xmlIn, xmlOut, callback) {
+
+  console.log(`Download: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+
   const commandKey = xmlIn.get("/soap-env:Envelope/soap-env:Body/cwmp:Download/CommandKey", NAMESPACES).text();
   const url = xmlIn.get("/soap-env:Envelope/soap-env:Body/cwmp:Download/URL", NAMESPACES).text();
 

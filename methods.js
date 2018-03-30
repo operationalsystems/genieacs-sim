@@ -34,7 +34,6 @@ const INFORM_PARAMS = [
 
 
 function inform(device, xmlOut, callback) {
-
   let body = xmlOut.root().childNodes()[1];
   let inform = body.node("cwmp:Inform");
   let deviceId = inform.node("DeviceId");
@@ -160,8 +159,8 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
   });
 
   for (let p of parameterNames) {
-    // let name = p.text();
-      let name = p;
+    //let name = p.text();
+    let name = p;
     let value = device[name][1];
     let type = device[name][2];
     let valueStruct = parameterList.node("ParameterValueStruct");

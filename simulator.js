@@ -94,21 +94,16 @@ function sendRequest(xml, callback) {
   return request.end(body);
 }
 
-
 function startSession() {
-  setInterval( runInform, 10000);
-}
+    const requestId = Math.random().toString(36).slice(-8);
+    const xmlOut = createSoapDocument(requestId);
 
-function runInform() {
-  const requestId = Math.random().toString(36).slice(-8);
-  const xmlOut = createSoapDocument(requestId);
-  methods.inform(device, xmlOut, function (xml) {
-    sendRequest(xml, function (xml) {
-      cpeRequest();
-    })
-  });
+    methods.inform(device, xmlOut, function(xml) {
+        sendRequest(xml, function(xml) {
+            cpeRequest();
+        });
+    });
 }
-
 
 function createFaultResponse(xmlOut, code, message) {
   let body = xmlOut.root().childNodes()[1];

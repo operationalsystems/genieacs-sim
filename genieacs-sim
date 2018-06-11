@@ -59,7 +59,7 @@ function pad(serial, size) {
 for (let i = 0; i < program.processes; ++ i) {
   setTimeout(function() {
     let env = {
-      "SERIAL_NUMBER": `CXNK${pad(program.serial,8)}`, //To mimic Calix Serial
+      "SERIAL_NUMBER": `CXNK${pad(program.serial + i,8)}`, //To mimic Calix Serial
       "ACS_URL": program.acsUrl,
       "DATA_MODEL": program.dataModel,
     };

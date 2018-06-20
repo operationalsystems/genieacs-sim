@@ -24,7 +24,7 @@ const program = require("commander")
   .version(pkg.version)
   .description(pkg.description)
   .option("-u, --acs-url [url]", "ACS URL to contact (default: http://127.0.0.1:7547/)", "http://127.0.0.1:7547/")
-  .option("-m, --data-model [filename]", "Data model template", resolvePath, "./data_model_202BC1-BM632w-8KA8WA1151100043.json")
+  .option("-m, --data-model [filename]", "Data model template", resolvePath, "./data_model_Calix-EC4F82-ENT.json")
   .option("-p, --processes [count]", "Number of devices to simulate (default: 1)", parseFloat, 1)
   .option("-w, --wait [milliseconds]", "Waiting period between process spawning (default: 1000)", parseFloat, 1000)
   .option("-s, --serial [offset]", "Serial number offset (default: 0)", parseFloat, 0)
@@ -47,11 +47,19 @@ cluster.on("exit", function(worker, code, signal) {
   }, 10000);
 });
 
+/**
+ * Function to left pad numbers. This is before ECMA2017, therefore padStart is not available.
+ */
+function pad(serial, size) {
+    var s =  serial + "";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
 
 for (let i = 0; i < program.processes; ++ i) {
   setTimeout(function() {
     let env = {
-      "SERIAL_NUMBER": `00000${program.serial + i}`.slice(-6),
+      "SERIAL_NUMBER": `CXNK${pad(program.serial + i,8)}`, //To mimic Calix Serial
       "ACS_URL": program.acsUrl,
       "DATA_MODEL": program.dataModel,
     };

@@ -147,23 +147,35 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
 
   console.log(`GetParameterValues: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
 
-  let parameterNames = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterValues/ParameterNames/*", NAMESPACES);
+  let parameterNames = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterValues/cwmp:ParameterNames/*", NAMESPACES);
+  //check whether we've received an empty string, which indicates a full parameter dump (Page 88, TR-069 Issue 1 Amendment 6
+  if (parameterNames && parameterNames.length === 1 && parameterNames[0].text().length === 0) {
+    //retrieve all the available paths on a device
+    parameterNames = getSortedPaths(device);
+  }
   let parameterList = xmlOut.root().childNodes()[1].node("cwmp:GetParameterValuesResponse").node("ParameterList");
-
-  parameterNames = getSortedPaths(device);
 
   parameterList.attr({
     "soap-enc:arrayType": "cwmp:ParameterValueStruct[" + parameterNames.length + "]"
   });
 
   for (let p of parameterNames) {
-    //let name = p.text();
-    let name = p;
-    let value = device[name][1];
-    let type = device[name][2];
-    let valueStruct = parameterList.node("ParameterValueStruct");
+    const name = typeof p === "string" ? p : p.text(); //handle the pNames coming back as a string[] from getSortedPaths
+    let value = '';
+    let type = 'string';
+    const parameter = device[name];
+    if (!parameter){
+      if (name[name.length-1] === '.') {
+          console.error(`[9005] Object Instance Wildcards not supported: ${p.text()}\nParameter value request ignored.`);
+          console.error('[9002] Fault responses not supported. Sending an invalid response.')
+      }
+    } else {
+        value = device[name][1];
+        type = device[name];
+    }
+    const valueStruct = parameterList.node("ParameterValueStruct");
     valueStruct.node("Name", name);
-    valueStruct.node("Value", device[name][1]).attr({
+    valueStruct.node("Value", value).attr({
       "xsi:type": type
     });
   }

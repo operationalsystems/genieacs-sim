@@ -162,7 +162,7 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
   for (let p of parameterNames) {
     const name = typeof p === "string" ? p : p.text(); //handle the pNames coming back as a string[] from getSortedPaths
     let value = '';
-    let type = 'string';
+    let type = 'xsd:string';
     const parameter = device[name];
     if (!parameter){
       if (name[name.length-1] === '.') {
@@ -170,8 +170,7 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
           console.error('[9002] Fault responses not supported. Sending an invalid response.')
       }
     } else {
-        value = device[name][1];
-        type = device[name];
+        [,value,type] = parameter;
     }
     const valueStruct = parameterList.node("ParameterValueStruct");
     valueStruct.node("Name", name);

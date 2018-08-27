@@ -172,7 +172,7 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
     if (!parameter) {
       if (name[name.length-1] === '.') {
           const resolvedParameterNames = getResolvedPaths(name, allParameterNames);
-          parameterNames.concat(resolvedParameterNames);
+          parameterNames.push(...resolvedParameterNames);
           break;
       }
     }

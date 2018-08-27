@@ -146,6 +146,7 @@ function GetParameterNames(device, xmlIn, xmlOut, callback) {
 function GetParameterValues(device, xmlIn, xmlOut, callback) {
 
   console.log(`GetParameterValues: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
+  let validParameters = 0;
 
   let parameterNames = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterValues/cwmp:ParameterNames/*", NAMESPACES);
   //check whether we've received an empty string, which indicates a full parameter dump (Page 88, TR-069 Issue 1 Amendment 6
@@ -155,29 +156,28 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
   }
   let parameterList = xmlOut.root().childNodes()[1].node("cwmp:GetParameterValuesResponse").node("ParameterList");
 
-  parameterList.attr({
-    "soap-enc:arrayType": "cwmp:ParameterValueStruct[" + parameterNames.length + "]"
-  });
-
   for (let p of parameterNames) {
     const name = typeof p === "string" ? p : p.text(); //handle the pNames coming back as a string[] from getSortedPaths
-    let value = '';
-    let type = 'xsd:string';
     const parameter = device[name];
-    if (!parameter){
+    if (!parameter) {
       if (name[name.length-1] === '.') {
-          console.error(`[9005] Object Instance Wildcards not supported: ${p.text()}\nParameter value request ignored.`);
+          console.error(`[9005] Object Instance Wildcards not supported: '${p.text()}'. Request ignored.`);
           console.error('[9002] Fault responses not supported. Sending an invalid response.')
       }
-    } else {
-        [,value,type] = parameter;
+      break;
     }
+    const [,value,type] = parameter;
     const valueStruct = parameterList.node("ParameterValueStruct");
     valueStruct.node("Name", name);
     valueStruct.node("Value", value).attr({
       "xsi:type": type
     });
+    validParameters++;
   }
+
+    parameterList.attr({
+        "soap-enc:arrayType": "cwmp:ParameterValueStruct[" + validParameters + "]"
+    });
 
   return callback(xmlOut);
 }

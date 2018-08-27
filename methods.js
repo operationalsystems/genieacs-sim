@@ -142,17 +142,27 @@ function GetParameterNames(device, xmlIn, xmlOut, callback) {
   return callback(xmlOut);
 }
 
+function getResolvedPaths(partialPath, allPaths) {
+    let resolvedPaths = [];
+    for (let p of allPaths) {
+        if (p.startsWith(partialPath)) {
+            resolvedPaths.push(p);
+        }
+    }
+    return resolvedPaths;
+}
 
 function GetParameterValues(device, xmlIn, xmlOut, callback) {
 
   console.log(`GetParameterValues: ${device['InternetGatewayDevice.DeviceInfo.SerialNumber'][1]}`);
   let validParameters = 0;
 
+  const allParameterNames = getSortedPaths(device);
   let parameterNames = xmlIn.find("/soap-env:Envelope/soap-env:Body/cwmp:GetParameterValues/cwmp:ParameterNames/*", NAMESPACES);
   //check whether we've received an empty string, which indicates a full parameter dump (Page 88, TR-069 Issue 1 Amendment 6
   if (parameterNames && parameterNames.length === 1 && parameterNames[0].text().length === 0) {
     //retrieve all the available paths on a device
-    parameterNames = getSortedPaths(device);
+    parameterNames = allParameterNames;
   }
   let parameterList = xmlOut.root().childNodes()[1].node("cwmp:GetParameterValuesResponse").node("ParameterList");
 
@@ -161,10 +171,10 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
     const parameter = device[name];
     if (!parameter) {
       if (name[name.length-1] === '.') {
-          console.error(`[9005] Object Instance Wildcards not supported: '${p.text()}'. Request ignored.`);
-          console.error('[9002] Fault responses not supported.')
+          const resolvedParameterNames = getResolvedPaths(name, allParameterNames);
+          parameterNames.concat(resolvedParameterNames);
+          break;
       }
-      break;
     }
     const [,value,type] = parameter;
     const valueStruct = parameterList.node("ParameterValueStruct");

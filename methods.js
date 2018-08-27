@@ -162,7 +162,7 @@ function GetParameterValues(device, xmlIn, xmlOut, callback) {
     if (!parameter) {
       if (name[name.length-1] === '.') {
           console.error(`[9005] Object Instance Wildcards not supported: '${p.text()}'. Request ignored.`);
-          console.error('[9002] Fault responses not supported. Sending an invalid response.')
+          console.error('[9002] Fault responses not supported.')
       }
       break;
     }

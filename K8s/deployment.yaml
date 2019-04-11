@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: geniacs-sim
+    app.kubernetes.io/instance: geniacs-sim
+    app.kubernetes.io/version: '1.0.0'
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/managed-by: kubectl
+  name: geniacs-sim-deployment
+  namespace: default
+spec:
+  replicas: 100
+  template:
+    metadata:
+      labels:  
+        app: geniacs-sim
+    spec:
+      containers:
+      -  image: 168168762339.dkr.ecr.us-east-1.amazonaws.com/tr69sim:latest
+         imagePullPolicy: Always
+         name: geniacs-sim
+         ports: 
+           - containerPort: 7547 
+
